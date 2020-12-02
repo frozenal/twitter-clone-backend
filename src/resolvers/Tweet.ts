@@ -67,17 +67,17 @@ export class TweetResolver {
   // create a tweet
   @Mutation(() => TweetResponse)
   async createTweet(
-    @Arg("options") options: TweetInput,
-    @Ctx() { TweetRepository, UserRepository }: MyContext
+    @Arg("content") content: string,
+    @Ctx() { TweetRepository, UserRepository, req }: MyContext
   ): Promise<TweetResponse> {
     let newTweet = new Tweet();
 
-    newTweet.content = options.content;
+    newTweet.content = content;
 
-    newTweet.authorId = options.authorId;
+    newTweet.authorId = req.session.userId;
 
     let author = await UserRepository.findOne({
-      where: { id: options.authorId },
+      where: { id: req.session.userId },
     });
 
     if (!author) {

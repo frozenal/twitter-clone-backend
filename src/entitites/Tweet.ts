@@ -25,7 +25,7 @@ export class Tweet {
   authorId: number;
 
   @Field(() => User)
-  @ManyToOne(() => User, (user) => user.tweets)
+  @ManyToOne(() => User, (user) => user.tweets, { onDelete: "CASCADE" })
   author: User;
 
   @Field()

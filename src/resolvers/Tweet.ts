@@ -39,7 +39,6 @@ export class TweetResolver {
     return tweets;
   }
 
-
   // get single tweet, for viewing tweet page
   @Query(() => TweetResponse)
   async tweet(
@@ -64,7 +63,6 @@ export class TweetResolver {
 
     return { tweet: tweet! };
   }
-
 
   // create a tweet
   @Mutation(() => TweetResponse)
@@ -91,5 +89,15 @@ export class TweetResolver {
     let tweet = await TweetRepository.save(newTweet);
 
     return { tweet: tweet! };
+  }
+
+  // delete a tweet
+  @Mutation(() => Boolean)
+  async deleteTweet(
+    @Arg("tweetId") tweetId: number,
+    @Ctx() { TweetRepository }: MyContext
+  ): Promise<Boolean> {
+    await TweetRepository.delete({ id: tweetId });
+    return true;
   }
 }

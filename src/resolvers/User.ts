@@ -11,9 +11,10 @@ import {
   Resolver,
 } from "type-graphql";
 import * as argon2 from "argon2";
+import { FindOneOptions } from "typeorm";
 
 @InputType()
-class UserInput {
+class RegisterInput {
   @Field()
   username: string;
 
@@ -38,7 +39,6 @@ class UserResponse {
   @Field(() => User, { nullable: true })
   user?: User;
 }
-
 @Resolver()
 export class UserResolver {
   // get all users (in the future, likely add an arg to allow searching)
@@ -75,8 +75,8 @@ export class UserResolver {
   // register user
   @Mutation(() => UserResponse)
   async register(
-    @Arg("options", () => UserInput) options: UserInput,
-    @Ctx() { UserRepository }: MyContext
+    @Arg("options", () => RegisterInput) options: RegisterInput,
+    @Ctx() { UserRepository, req }: MyContext
   ): Promise<UserResponse> {
     if (
       options.username.length == 0 ||
@@ -101,6 +101,7 @@ export class UserResolver {
           },
         ],
       };
+      ``;
     }
 
     let newUser = new User();
@@ -142,7 +143,57 @@ export class UserResolver {
       }
     }
 
-    console.log(user!.id);
+    req.session!.userId = user!.id;
+
     return { user: user! };
+  }
+
+  @Mutation(() => UserResponse)
+  async login(
+    @Arg("handleOrEmail") handleOrEmail: string,
+    @Arg("password") password: string,
+    @Ctx() { UserRepository, req }: MyContext
+  ): Promise<UserResponse> {
+    if (handleOrEmail.length == 0) {
+      return {
+        errors: [
+          {
+            field: "handleOrEmail",
+            message: "You must have a handle or an email!",
+          },
+        ],
+      };
+    }
+
+    let whereString: FindOneOptions<User> = handleOrEmail.includes("@")
+      ? { where: { email: handleOrEmail } }
+      : { where: { handle: handleOrEmail } };
+    let user = await UserRepository.findOne(whereString);
+    if (!user) {
+      return {
+        errors: [
+          {
+            field: "handleOrEmail",
+            message: "There is no user with that handle or email!",
+          },
+        ],
+      };
+    }
+
+    const validPassword = await argon2.verify(user.password, password);
+    if (!validPassword) {
+      return {
+        errors: [
+          {
+            field: "password",
+            message: "The passwords do not match!",
+          },
+        ],
+      };
+    }
+
+    req.session!.userId = user.id;
+
+    return { user };
   }
 }

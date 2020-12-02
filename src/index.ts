@@ -1,6 +1,9 @@
 import "reflect-metadata";
 import { ApolloServer } from "apollo-server-express";
+import connectRedis from "connect-redis";
 import express from "express";
+import session from "express-session";
+import cors from "cors";
 import { UserResolver } from "./resolvers/User";
 import { buildSchema } from "type-graphql";
 import { createConnection } from "typeorm";
@@ -24,6 +27,7 @@ const main = async () => {
     const TweetRepository = connection.getRepository(Tweet);
     const UserRepository = connection.getRepository(User);
 
+    const RedisStore = connectRedis(session);
     const redis = new Redis({ host: process.env.REDIS_HOST || "127.0.0.1" });
 
     console.log(await redis.ping());
@@ -33,14 +37,34 @@ const main = async () => {
 
     const app = express();
 
+    app.use(
+      session({
+        name: "qid",
+        store: new RedisStore({
+          client: redis,
+          disableTouch: true,
+        }),
+        cookie: {
+          maxAge: 1000 * 60 * 60 * 24 * 365,
+          httpOnly: true,
+          sameSite: "lax",
+          secure: false,
+        },
+        saveUninitialized: false,
+        secret: "lolthisisasecret",
+        resave: false,
+      })
+    );
+
     const apolloServer = new ApolloServer({
       schema: await buildSchema({
         resolvers: [TweetResolver, UserResolver],
         validate: false,
       }),
-      context: (): MyContext => ({
+      context: ({ req }): MyContext => ({
         TweetRepository,
         UserRepository,
+        req,
       }),
     });
 

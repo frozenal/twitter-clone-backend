@@ -2,6 +2,10 @@
 ARG VARIANT="14-buster"
 FROM mcr.microsoft.com/vscode/devcontainers/typescript-node:0-${VARIANT}
 
+#Set up git
+RUN git config --global user.name "frozenal"
+RUN git config --global user.email "georgiajosh22@gmail.com"
+
 # Update args in docker-compose.yaml to set the UID/GID of the "node" user.
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID

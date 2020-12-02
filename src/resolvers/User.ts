@@ -41,13 +41,13 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
-  // get users
-
+  // get all users (in the future, likely add an arg to allow searching)
   @Query(() => [User])
   async users(@Ctx() { UserRepository }: MyContext) {
     return UserRepository.find({ relations: ["tweets"] });
   }
 
+  // get single user
   @Query(() => UserResponse)
   async user(
     @Arg("userId") userId: number,
@@ -72,6 +72,7 @@ export class UserResolver {
     return { user: user! };
   }
 
+  // register user
   @Mutation(() => UserResponse)
   async register(
     @Arg("options", () => UserInput) options: UserInput,

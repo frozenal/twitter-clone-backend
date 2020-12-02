@@ -31,7 +31,7 @@ class TweetResponse {
 
 @Resolver()
 export class TweetResolver {
-  //get tweets
+  //get all tweets (in the future, i'll likely add an argument that allows this to only pertain to the tweets of those that the user is following)
   @Query(() => [Tweet])
   async tweets(@Ctx() { TweetRepository }: MyContext) {
     const tweets = TweetRepository.find({ relations: ["author"] });
@@ -39,6 +39,34 @@ export class TweetResolver {
     return tweets;
   }
 
+
+  // get single tweet, for viewing tweet page
+  @Query(() => TweetResponse)
+  async tweet(
+    @Arg("tweetId") tweetId: number,
+    @Ctx() { TweetRepository }: MyContext
+  ): Promise<TweetResponse> {
+    let tweet = await TweetRepository.findOne({
+      where: { id: tweetId },
+      relations: ["author"],
+    });
+
+    if (!tweet) {
+      return {
+        errors: [
+          {
+            field: "tweetId",
+            message: "No tweet found!",
+          },
+        ],
+      };
+    }
+
+    return { tweet: tweet! };
+  }
+
+
+  // create a tweet
   @Mutation(() => TweetResponse)
   async createTweet(
     @Arg("options") options: TweetInput,

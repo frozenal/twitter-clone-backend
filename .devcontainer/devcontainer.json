@@ -1,0 +1,60 @@
+// Update the VARIANT arg in docker-compose.yml to pick a Node.js version: 10, 12, 14 
+{
+	"name": "Node.js, PostgreSQL, TypeScript",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+	"workspaceFolder": "/workspace",
+
+	// Set *default* container specific settings.json values on container create.
+	"settings": { 
+		"terminal.integrated.shell.linux": "/bin/bash",
+		"sqltools.connections": [{
+			"name": "Container database",
+			"driver": "PostgreSQL",
+			"previewLimit": 50,
+			"server": "localhost",
+			"port": 5432,
+			"database": "postgres",
+			"username": "postgres",
+			"password": "postgres"
+		}]
+	},
+
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		"dbaeumer.vscode-eslint",
+		"mtxr.sqltools",
+		"mtxr.sqltools-driver-pg",
+		"ms-vscode.vscode-typescript-tslint-plugin",
+		"apollographql.vscode-apollo",
+		"streetsidesoftware.code-spell-checker",
+		"pranaygp.vscode-css-peek",
+		"eamodio.gitlens",
+		"spywhere.guides",
+		"ecmel.vscode-html-css",
+		"oderwat.indent-rainbow",
+		"christian-kohler.path-intellisense",
+		"bradlc.vscode-tailwindcss",
+		"formulahendry.auto-close-tag",
+		"formulahendry.auto-rename-tag",
+		"coenraads.bracket-pair-colorizer-2",
+		"msjsdiag.debugger-for-chrome",
+		"icrawl.discord-vscode",
+		"dsznajder.es7-react-js-snippets",
+		"abusaidm.html-snippets",
+		"ms-azuretools.vscode-docker",
+		"xabikos.javascriptsnippets",
+		"ahmadawais.shades-of-purple",
+		"vscode-icons-team.vscode-icons",
+		"esbenp.prettier-vscode"
+	],
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	"forwardPorts": [3000, 4000, 5432],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	"postCreateCommand": "cd server && npm install",
+
+	// Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
+	// "remoteUser": "node"
+}

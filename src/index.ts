@@ -61,10 +61,11 @@ const main = async () => {
         resolvers: [TweetResolver, UserResolver],
         validate: false,
       }),
-      context: ({ req }): MyContext => ({
+      context: ({ req, res }): MyContext => ({
         TweetRepository,
         UserRepository,
         req,
+        res
       }),
     });
 

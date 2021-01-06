@@ -19,7 +19,7 @@ require("dotenv").config();
 const main = async () => {
   createConnection({
     type: "postgres",
-    url: "postgres://postgres:postgres@db:5432/postgres",
+    url: "postgres://jchisolm:goldiscool1@localhost:5432/twitterdb",
     // url: process.env.DATABASE_URL,
     entities: [Tweet, User],
     synchronize: __prod__,
@@ -65,7 +65,7 @@ const main = async () => {
         TweetRepository,
         UserRepository,
         req,
-        res
+        res,
       }),
     });
 

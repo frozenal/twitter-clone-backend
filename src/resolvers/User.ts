@@ -44,7 +44,19 @@ export class UserResolver {
   // get all users (in the future, likely add an arg to allow searching)
   @Query(() => [User])
   async users(@Ctx() { UserRepository }: MyContext) {
-    return UserRepository.find({ relations: ["tweets"] });
+    const users = UserRepository.find({
+      relations: ["tweets"],
+      join: {
+        alias: "user",
+        leftJoinAndSelect: {
+          likes: "user.likedPosts",
+          tweet: "likes.tweet",
+          tweetAuthor: "tweet.author",
+        },
+      },
+    });
+
+    return users;
   }
 
   // get single user

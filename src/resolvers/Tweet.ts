@@ -41,6 +41,7 @@ export class TweetResolver {
     // });
 
     const tweets = TweetRepository.find({
+      relations: ["author"],
       join: {
         alias: "tweet",
         leftJoinAndSelect: {
@@ -49,8 +50,6 @@ export class TweetResolver {
         },
       },
     });
-
-    console.log(await tweets);
 
     return tweets;
   }

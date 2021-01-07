@@ -3,11 +3,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Like,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { Tweet } from "./Tweet";
+import { TweetLike } from "./TweetLIke";
 
 @Entity()
 @ObjectType()
@@ -42,6 +44,10 @@ export class User {
     cascade: true,
   })
   tweets: Tweet[];
+
+  @Field(() => [TweetLike])
+  @OneToMany(() => TweetLike, (like) => like.user)
+  likedPosts: TweetLike[];
 
   @CreateDateColumn({ type: "timestamp" })
   created_at: Date;

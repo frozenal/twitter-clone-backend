@@ -10,6 +10,8 @@ import {
   Query,
   Resolver,
 } from "type-graphql";
+import { TweetLike } from "../entitites/TweetLike";
+import { getConnection } from "typeorm";
 
 @InputType()
 class TweetInput {
@@ -34,7 +36,21 @@ export class TweetResolver {
   //get all tweets (in the future, i'll likely add an argument that allows this to only pertain to the tweets of those that the user is following)
   @Query(() => [Tweet])
   async tweets(@Ctx() { TweetRepository }: MyContext) {
-    const tweets = TweetRepository.find({ relations: ["author"] });
+    // const tweets = TweetRepository.find({
+    //   relations: ["author", "userLikes"],
+    // });
+
+    const tweets = TweetRepository.find({
+      join: {
+        alias: "tweet",
+        leftJoinAndSelect: {
+          likes: "tweet.userLikes",
+          user: "likes.user",
+        },
+      },
+    });
+
+    console.log(await tweets);
 
     return tweets;
   }
@@ -99,5 +115,24 @@ export class TweetResolver {
   ): Promise<Boolean> {
     await TweetRepository.delete({ id: tweetId });
     return true;
+  }
+
+  @Mutation(() => Boolean)
+  async likeTweet(
+    @Arg("tweetid") tweetId: number,
+    @Ctx() { TweetRepository, UserRepository, LikeRepository, req }: MyContext
+  ): Promise<Boolean> {
+    if (!req.session.userId) {
+      return false;
+    } else {
+      const like = new TweetLike();
+
+      like.userId = req.session.userId;
+      like.tweetId = tweetId;
+
+      LikeRepository.save(like);
+
+      return true;
+    }
   }
 }

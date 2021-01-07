@@ -4,9 +4,11 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { TweetLike } from "./TweetLIke";
 import { User } from "./User";
 
 @Entity()
@@ -27,6 +29,10 @@ export class Tweet {
   @Field(() => User)
   @ManyToOne(() => User, (user) => user.tweets, { onDelete: "CASCADE" })
   author: User;
+
+  @Field(() => [TweetLike])
+  @OneToMany(() => TweetLike, (like) => like.tweet, { onDelete: "CASCADE" })
+  userLikes: TweetLike[];
 
   @Field()
   @CreateDateColumn({ type: "timestamp" })

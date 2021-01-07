@@ -13,6 +13,7 @@ import { __prod__ } from "./constants";
 import { MyContext } from "./types";
 import { TweetResolver } from "./resolvers/Tweet";
 import Redis from "ioredis";
+import { TweetLike } from "./entitites/TweetLIke";
 
 require("dotenv").config();
 
@@ -21,11 +22,12 @@ const main = async () => {
     type: "postgres",
     url: "postgres://jchisolm:goldiscool1@localhost:5432/twitterdb",
     // url: process.env.DATABASE_URL,
-    entities: [Tweet, User],
+    entities: [Tweet, User, TweetLike],
     synchronize: __prod__,
   }).then(async (connection) => {
     const TweetRepository = connection.getRepository(Tweet);
     const UserRepository = connection.getRepository(User);
+    const LikeRepository = connection.getRepository(TweetLike);
 
     const RedisStore = connectRedis(session);
     const redis = new Redis({ host: process.env.REDIS_HOST || "127.0.0.1" });
@@ -64,6 +66,7 @@ const main = async () => {
       context: ({ req, res }): MyContext => ({
         TweetRepository,
         UserRepository,
+        LikeRepository,
         req,
         res,
       }),

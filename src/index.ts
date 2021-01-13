@@ -20,7 +20,7 @@ require("dotenv").config();
 const main = async () => {
   createConnection({
     type: "postgres",
-    url: "postgres://jchisolm:goldiscool1@localhost:5432/twitterdb",
+    url: process.env.POSTGRES_CONNECTION_URL,
     // url: process.env.DATABASE_URL,
     entities: [Tweet, User, TweetLike],
     synchronize: __prod__,

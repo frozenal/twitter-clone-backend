@@ -32,12 +32,19 @@ const main = async () => {
     const RedisStore = connectRedis(session);
     const redis = new Redis({ host: process.env.REDIS_HOST || "127.0.0.1" });
 
-    console.log(await redis.ping());
-
     // TweetRepository.delete({});
     // UserRepository.delete({});
 
     const app = express();
+
+    // app.use(
+    //   cors({
+    //     origin: "http://localhost:3000",
+    //     credentials: true,
+    //   })
+    // );
+
+    const corsOptions = { credentials: true, origin: "http://localhost:3000" };
 
     app.use(
       session({
@@ -72,7 +79,7 @@ const main = async () => {
       }),
     });
 
-    apolloServer.applyMiddleware({ app });
+    apolloServer.applyMiddleware({ app, cors: corsOptions });
 
     app.listen(4000, () => {
       console.log("Server is live on port 4000");

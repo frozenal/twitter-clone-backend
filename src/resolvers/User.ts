@@ -133,11 +133,13 @@ export class UserResolver {
       newUser.user_bio = options.user_bio;
     }
 
-    if (options.handle) {
-      newUser.handle = options.handle;
-    } else {
-      newUser.handle = options.username;
-    }
+    newUser.handle = options.username;
+
+    // if (options.handle) {
+    //   newUser.handle = options.handle;
+    // } else {
+    //   newUser.handle = options.username;
+    // }
 
     let user: User;
     try {
